@@ -34,7 +34,7 @@ void main(List<String> args) async {
     query,
     similar: withSimilar,
     startsWith: withStart,
-    baseform: withBaseForm
+    baseForm: withBaseForm
   );
 
   for (var syn in response.synonymSet!) {
