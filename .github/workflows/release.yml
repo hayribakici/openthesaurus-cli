@@ -30,7 +30,7 @@ jobs:
           export DART_BINS=$(ls bin/*.dart)
           for dart_file in $DART_BINS; do
               echo "Compiling $dart_file"
-              dart compile exe $dart_file -o bin/$dart_file%.*
+              dart compile exe $dart_file -o ${dart_file%.*}
           done
           chmod +x bin/*
           export TARGET_ZIP=${{ matrix.os }}_${{ github.event.release.tag_name }}.zip
