@@ -30,9 +30,9 @@ jobs:
           export DART_BINS=$(ls bin/*.dart)
           for dart_file in $DART_BINS; do
               echo "Compiling $dart_file"
-              dart compile exe $dart_file -o ${dart_file%.*}.bin
+              dart compile exe $dart_file
           done
-          chmod +x bin/*.bin
+          chmod +x bin/*.exe
           export TARGET_GZ=${{ matrix.os }}_${{ github.event.release.tag_name }}.tar.gz
-          tar -czvf $TARGET_GZ bin/*.bin
+          tar -czvf $TARGET_GZ bin/*.exe
           gh release upload ${{ github.event.release.tag_name }} $TARGET_GZ
