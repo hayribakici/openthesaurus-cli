@@ -9,7 +9,7 @@ This is a cross platform command line application for accessing the API of [open
 Run program with dart
 
 ```
-dart run ot.dart <query>
+dart run src/ot.dart <query>
 ```
 
 ### binary (macOS, linux)
