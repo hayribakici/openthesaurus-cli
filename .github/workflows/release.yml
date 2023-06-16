@@ -30,12 +30,10 @@ jobs:
           export DART_BINS=$(ls bin/*.dart)
           for dart_file in $DART_BINS; do
               echo "Compiling $dart_file"
-              {{if matrix.os eq macos || matrix.os eq ubuntu}}
-                dart compile exe $dart_file -o bin/$dart_file%.*
-              {{else}}
-                dart compile exe $dart_file
+              dart compile exe $dart_file -o bin/$dart_file%.*
           done
           chmod +x bin/*
           export TARGET_ZIP=${{ matrix.os }}_${{ github.event.release.tag_name }}.zip
           tar -r $TARGET_ZIP bin/*.exe
           gh release upload ${{ github.event.release.tag_name }} $TARGET_ZIP
+        
