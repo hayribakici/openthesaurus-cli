@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:chalkdart/chalk_x11.dart';
 import 'package:openthesaurus/openthesaurus.dart';
 import 'package:args/args.dart';
@@ -39,7 +41,7 @@ void main(List<String> args) async {
 
   ArgResults argResults = parser.parse(args);
   if (argResults.rest.isEmpty) {
-    print('Enter a query to retrieve synonums.');
+    print('Enter a query to retrieve synonyms.');
     exitCode = 1;
     return;
   }
@@ -56,7 +58,7 @@ void main(List<String> args) async {
   var response = await ot.getWithSubString(query,
       similar: withSimilar,
       startsWith: withStart,
-      baseForm: withBaseForm,
+      baseForm: true,
       superSet: withSuperSets,
       subSet: withSubSets,
       from: withFromOption ?? 0,
@@ -67,63 +69,79 @@ void main(List<String> args) async {
   for (int i = 0; i < query.length; i++) {
     buffer.write(chalk.saddleBrown('='));
   }
-  synonyms(buffer, response);
+  synonyms(buffer, response, query);
   if (withSimilar || withStart) {
-    buffer.writeln('Teilwort-Treffer und ähnlich geschriebene Wörter:');
-    if (withSimilar) {
-      similars(buffer, response);
-    }
-    if (withStart) {
-      var start = response.startsWithTerms;
-      buffer.writeln(terms(start));
-    }
+    similars(buffer, response, withSimilar, withStart);
   }
-  if (withBaseForm) {
-    buffer.writeln('\nWörter mit gleicher Grundform:\n');
+  if (withBaseForm && (response.baseForms?.isNotEmpty ?? false)) {
+    buffer.writeln('');
+    buffer.writeln(chalk.bold.white('Wörter mit gleicher Grundform:'));
+    buffer.writeln(response.baseForms?.join(', '));
+    // }
   }
   print(buffer.toString());
 }
 
-void synonyms(StringBuffer buffer, OpenThesaurusResponse response) {
-  // buffer.writeln('\n\nSynoyme:');
-  buffer.writeln('\n');
+void synonyms(
+    StringBuffer buffer, OpenThesaurusResponse response, String query) {
+  buffer.writeln('\n${chalk.bold.white('Synonyme')}:');
 
   var synSet = response.synonymSet!;
-
   for (var syn in synSet) {
     if (syn.categories?.isNotEmpty ?? false) {
       var label = syn.categories?.length == 1 ? 'Kategorie:' : 'Kategoren:';
-      buffer.writeln(chalk.slateGray(label, syn.categories?.join(', ')));
+      buffer.write(chalk.slateGray(' ['));
+      buffer.write(chalk.slateGray(label, syn.categories?.join(', ')));
+      buffer.writeln(chalk.slateGray(']'));
     }
 
-    buffer.write(chalk.blue('* '));
-    buffer.writeln('${chalk.bold.white('Synonyme:')} ${synTerms(syn.terms)}');
+    buffer.writeln('${chalk.blue('*')} ${synTerms(syn.terms, query)}');
     if (syn.superSet?.isNotEmpty ?? false) {
+      var label = syn.superSet?.length == 1 ? 'Oberbegriff:' : 'Oberbegriffe:';
       buffer.writeln(
-          '${chalk.blue('**')} ${chalk.gray('Oberbegriffe:')} ${synTerms(syn.superSet)}');
+          '${blueBullet('*', length: 2)} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
     }
 
     if (syn.subSet?.isNotEmpty ?? false) {
       buffer.writeln(
-          '${chalk.blue('**')} ${chalk.gray('Unterbegriffe:')} ${synTerms(syn.subSet)}');
+          '${blueBullet('*', length: 2)} ${chalk.aliceBlue('Unterbegriffe:')} ${synTerms(syn.subSet)}');
     }
 
     buffer.writeln('');
   }
 }
 
-void similars(StringBuffer buffer, OpenThesaurusResponse response) {
-  buffer.writeln('\nÄhnliche Wörter:\n');
-
-  var sim = response.similarTerms;
-  buffer.writeln('* ${terms(sim)}');
+void similars(StringBuffer buffer, OpenThesaurusResponse response,
+    bool withSimilar, bool withStart) {
+  buffer.writeln(
+      chalk.bold.white('Teilwort-Treffer und ähnlich geschriebene Wörter:'));
+  List<Term> out = [];
+  if (withSimilar) {
+    var sim = response.similarTerms;
+    sim?.sort((t1, t2) => t1.distance?.compareTo(t2.distance!) ?? 0);
+    out.addAll(response.similarTerms as List<Term>);
+    // buffer.write('* ${terms(sim)}');
+  }
+  if (withStart) {
+    out.addAll(response.startsWithTerms as Iterable<Term>);
+  }
+  buffer.writeln(terms(out));
 }
 
-String synTerms(List<SynonymTerm>? terms) =>
+Object blueBullet(String bullet, {int length = 1}) {
+  var a = List.generate(length, (index) => bullet);
+  return chalk.blue(a.join());
+}
+
+Object synTerms(List<SynonymTerm>? terms, [String query = '']) =>
     terms?.map((term) {
-      var out = '${term.term}';
+      var out = term.term ?? '';
+
+      if (query == out) {
+        out = chalk.italic.onYellow.black(out);
+      }
       if (term.level != null) {
-        out += ' (${term.level?.abbr})';
+        out += chalk.dimGray(' (${term.level?.abbr})');
       }
       return out;
     }).join(', ') ??
