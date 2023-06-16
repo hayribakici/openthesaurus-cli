@@ -112,22 +112,23 @@ void synonyms(
   var synSet = response.synonymSet!;
   for (var syn in synSet) {
     if (syn.categories?.isNotEmpty ?? false) {
-      var label = syn.categories?.length == 1 ? 'Kategorie:' : 'Kategoren:';
+      var label = syn.categories?.length == 1 ? 'Kategorie:' : 'Kategorien:';
       buffer.write(chalk.slateGray(' ['));
       buffer.write(chalk.slateGray(label, syn.categories?.join(', ')));
       buffer.writeln(chalk.slateGray(']'));
     }
 
-    buffer.writeln('${chalk.blue('*')} ${synTerms(syn.terms, query)}');
+    buffer.writeln('${blueBullet('*')} ${synTerms(syn.terms, query)}');
     if (syn.superSet?.isNotEmpty ?? false) {
       var label = syn.superSet?.length == 1 ? 'Oberbegriff:' : 'Oberbegriffe:';
       buffer.writeln(
-          '${blueBullet('*', length: 2)} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
+          '${blueBullet('  *')} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
     }
 
     if (syn.subSet?.isNotEmpty ?? false) {
+      var label = syn.superSet?.length == 1 ? 'Unterbegriff:' : 'Unterbegriffe:';
       buffer.writeln(
-          '${blueBullet('*', length: 2)} ${chalk.aliceBlue('Unterbegriffe:')} ${synTerms(syn.subSet)}');
+          '${blueBullet('  *')} ${chalk.aliceBlue(label)} ${synTerms(syn.subSet)}');
     }
 
     buffer.writeln('');
