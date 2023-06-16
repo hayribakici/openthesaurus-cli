@@ -7,8 +7,9 @@ environment:
   sdk: '>=2.19.2 <3.0.0'
 
 dependencies:
-  openthesaurus: 0.0.4
+  openthesaurus: 0.0.5
   args: ^2.4.2
+  chalkdart: ^2.0.9
 
 dev_dependencies:
   lints: ^2.0.0
