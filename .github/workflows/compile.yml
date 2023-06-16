@@ -6,5 +6,18 @@ on:
       - "v[0-9]+.[0-9]+.[0-9]+*"
 
 jobs:
-  publish:
-    uses: CaiJingLong/action-dart-compile@v1.0.1
+  upload:
+    strategy:
+        matrix:
+          os: [windows, macos, ubuntu]
+    runs-on: ${{ matrix.os }}-latest
+    name: Upload ${{ matrix.os }} binaries to release ${{ github.event.release.tag_name }}
+    steps:
+      - name: Upload binaries to release ${{ github.event.release.tag_name }} on ${{ matrix.os }}
+        uses: caijinglong/action-dart-compile@v1
+    env:
+        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    permissions:
+        contents: write
+  # publish:
+  #   uses: CaiJingLong/action-dart-compile@v1.0.1
