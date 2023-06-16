@@ -33,7 +33,6 @@ jobs:
               dart compile exe $dart_file -o ${dart_file%.*}.bin
           done
           chmod +x bin/*.bin
-          export TARGET_ZIP=${{ matrix.os }}_${{ github.event.release.tag_name }}.zip
-          zip -r $TARGET_ZIP bin/*.bin
-          gh release upload ${{ github.event.release.tag_name }} $TARGET_ZIP
-        
+          export TARGET_GZ=${{ matrix.os }}_${{ github.event.release.tag_name }}.tar.gz
+          tar -czvf $TARGET_GZ bin/*.bin
+          gh release upload ${{ github.event.release.tag_name }} $TARGET_GZ
