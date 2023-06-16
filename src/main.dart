@@ -172,13 +172,3 @@ Object synTerms(List<SynonymTerm>? terms, [String query = '']) =>
 
 String terms(List<Term>? terms) =>
     terms?.map((term) => term.term).join(', ') ?? '';
-
-
-
-
-// class SubStringCommand extends BaseCommand {
-
-//   SubStringBaseCommand() {
-//   }: super();
-
-// }
