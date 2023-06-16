@@ -8,21 +8,20 @@ This is a cross platform command line application for accessing the API of [open
 
 Run program with dart
 
-```
-dart run src/ot.dart <query>
+```bash
+dart run src/main.dart <query>
 ```
 
-### binary (macOS, linux)
+### Run as binary
 
-```terminal
-./ot <query>
-```
+* macOS, linux: `./ot <query>`
+* windows : `ot.exe <query>`
 
 ### Options
 
 Run openthesaurus with the following options
 
-```
+```bash
 ot [options] <query>
 
 Options:
