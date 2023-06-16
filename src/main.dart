@@ -23,6 +23,20 @@ void main(List<String> args) async {
         negatable: false,
         help: 'Return words that are more specific to the query',
         abbr: 'b')
+    ..addFlag(baseForm,
+        negatable: false,
+        help: 'Return the base form of the queried word',
+        abbr: 'e')
+    ..addOption(from,
+        help:
+            'Return substrings with the starting position. Can only be used with \'--start\' flag',
+        abbr: 'f',
+        valueHelp: 'NUMBER')
+    ..addOption(maxResults,
+        help:
+            'Limit the number of substring results. Can only be used with \'--start\' flag',
+        abbr: 'm',
+        valueHelp: 'NUMBER')
     ..addFlag(superSet,
         negatable: false,
         help: 'Return words that are more generic to the query',
@@ -31,14 +45,6 @@ void main(List<String> args) async {
         negatable: false,
         help: 'Return words that have the same starting letters as the query',
         abbr: 's')
-    ..addOption(from,
-        help: 'Return substrings with the starting position', abbr: 'f')
-    ..addOption(maxResults,
-        help: 'Limit the number of substring results', abbr: 'm')
-    ..addFlag(baseForm,
-        negatable: false,
-        help: 'Return the base form of the queried word',
-        abbr: 'e')
     ..addCommand('help');
 
   ArgResults argResults = parser.parse(args);
@@ -60,14 +66,20 @@ void main(List<String> args) async {
   var withBaseForm = argResults[baseForm] as bool;
   var withSuperSets = argResults[superSet] as bool;
   var withSubSets = argResults[subSet] as bool;
-  var withFromOption = argResults[from] as int?;
-  var withMaxOption = argResults[maxResults] as int?;
+  var withFromOption = int.tryParse(argResults[from] ?? '');
+  var withMaxOption = int.tryParse(argResults[maxResults] ?? '');
+
+  if ((withFromOption != null || withMaxOption != null) && !withStart) {
+    print('Use options \'from\' and \'maxResults\' with \'--start\' (-s) flag.');
+    exitCode = 1;
+    return;
+  }
 
   var ot = OpenThesaurus.create();
   var response = await ot.getWithSubString(query,
       similar: withSimilar,
       startsWith: withStart,
-      baseForm: true,
+      baseForm: withBaseForm,
       superSet: withSuperSets,
       subSet: withSubSets,
       from: withFromOption ?? 0,
@@ -86,7 +98,6 @@ void main(List<String> args) async {
     buffer.writeln('');
     buffer.writeln(chalk.bold.white('Wörter mit gleicher Grundform:'));
     buffer.writeln(response.baseForms?.join(', '));
-    // }
   }
   print(buffer.toString());
 }

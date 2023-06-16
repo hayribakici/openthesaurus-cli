@@ -14,7 +14,7 @@ dart run src/main.dart <query>
 
 ### Run as binary
 
-* macOS, linux: `./ot <query>`
+* macOS, linux: `./ot.exe <query>`
 * windows : `ot.exe <query>`
 
 ### Options
@@ -25,11 +25,11 @@ Run openthesaurus with the following options
 ot [options] <query>
 
 Options:
--a, --similar       Return similar spelled words, helpful for misspellings
--b, --sub           Return words that are more specific to the query
--p, --sup           Return words that are more generic to the query
--s, --startswith    Return words that have the same starting letters as the query
--f, --from          Return substrings with the starting position
--m, --maxResults    Limit the number of substring results
--e, --baseform      Return the base form of the queried word
+-a, --similar                Return similar spelled words, helpful for misspellings
+-b, --sub                    Return words that are more specific to the query
+-e, --baseform               Return the base form of the queried word
+-f, --from=<NUMBER>          Return substrings with the starting position. Can only be used with '--start' flag
+-m, --maxResults=<NUMBER>    Limit the number of substring results. Can only be used with '--start' flag
+-p, --sup                    Return words that are more generic to the query
+-s, --startswith             Return words that have the same starting letters as the query
 ```
