@@ -1,5 +1,3 @@
-import 'dart:ffi';
-
 import 'package:chalkdart/chalk_x11.dart';
 import 'package:openthesaurus/openthesaurus.dart';
 import 'package:args/args.dart';
