@@ -19,25 +19,36 @@ void main(List<String> args) async {
         negatable: false,
         help: 'Return similar spelled words, helpful for misspellings',
         abbr: 'a')
-    ..addFlag(start,
-        negatable: false,
-        help: 'Return words that have the same starting letters as the query',
-        abbr: 's')
     ..addFlag(subSet,
         negatable: false,
         help: 'Return words that are more specific to the query',
-        abbr: 'u')
+        abbr: 'b')
     ..addFlag(superSet,
         negatable: false,
         help: 'Return words that are more generic to the query',
         abbr: 'p')
+    ..addFlag(start,
+        negatable: false,
+        help: 'Return words that have the same starting letters as the query',
+        abbr: 's')
     ..addOption(from,
         help: 'Return substrings with the starting position', abbr: 'f')
     ..addOption(maxResults,
         help: 'Limit the number of substring results', abbr: 'm')
-    ..addFlag(baseForm, negatable: false, abbr: 'b');
+    ..addFlag(baseForm,
+        negatable: false,
+        help: 'Return the base form of the queried word',
+        abbr: 'e')
+    ..addCommand('help');
 
   ArgResults argResults = parser.parse(args);
+  ArgResults? help = argResults.command;
+  if (help != null) {
+    print(chalk.bold.white('ot [options] <query>'));
+    print('\nOptions:');
+    print(parser.usage);
+    return;
+  }
   if (argResults.rest.isEmpty) {
     print('Enter a query to retrieve synonyms.');
     exitCode = 1;
