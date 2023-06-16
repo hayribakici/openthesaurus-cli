@@ -10,7 +10,6 @@ dependencies:
   openthesaurus: 0.0.5
   args: ^2.4.2
   chalkdart: ^2.0.9
-  compile: ^0.0.6
 
 dev_dependencies:
   lints: ^2.0.0
