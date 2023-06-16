@@ -1,2 +1,10 @@
-name: action-dart-compile
-uses: CaiJingLong/action-dart-compile@v1.0.1
+name: Upload release to github
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+*"
+
+jobs:
+  publish:
+    uses: CaiJingLong/action-dart-compile@v1.0.1
