@@ -17,6 +17,16 @@ dart run src/main.dart <query>
 * macOS, linux: `./ot.exe <query>`
 * windows : `ot.exe <query>`
 
+### Build yourself
+
+You can also build it yourself with
+
+```bash
+dart compile exe bin/ot.dart -o ot
+```
+
+which creates a binary file `ot` and which you can add into your `~/bin` folder. 
+
 ### Options
 
 Run openthesaurus with the following options
