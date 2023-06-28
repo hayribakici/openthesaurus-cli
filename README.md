@@ -43,3 +43,7 @@ Options:
 -p, --sup                    Return words that are more generic to the query
 -s, --startswith             Return words that have the same starting letters as the query
 ```
+
+### Acknowledgements
+
+This program has ben inspired by [radomirbosak/duden](https://github.com/radomirbosak/duden).
