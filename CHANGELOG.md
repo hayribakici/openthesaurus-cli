@@ -1,3 +1,7 @@
+## 0.0.4
+
+- highlights case insensitive query-term in search results
+
 ## 0.0.3
 
 - adds some better error handling
