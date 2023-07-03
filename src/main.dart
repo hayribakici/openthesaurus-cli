@@ -116,13 +116,16 @@ ArgParser createAndSetupArgParser() => ArgParser()
 
 void synonyms(
     StringBuffer buffer, OpenThesaurusResponse response, String query) {
+  if (response.synonymSet == null) {
+    return;
+  }
   buffer.writeln('${chalk.bold.white('Synonyme')}:');
 
   var synSet = response.synonymSet!;
   for (var syn in synSet) {
     if (syn.categories?.isNotEmpty ?? false) {
       var label = syn.categories?.length == 1 ? 'Kategorie:' : 'Kategorien:';
-      buffer.write(chalk.slateGray(' ['));
+      buffer.write(chalk.slateGray('['));
       buffer.write(chalk.slateGray(label, syn.categories?.join(', ')));
       buffer.writeln(chalk.slateGray(']'));
     }
@@ -153,7 +156,7 @@ void similars(StringBuffer buffer, OpenThesaurusResponse response,
   if (withSimilar) {
     var sim = response.similarTerms;
     sim?.sort((t1, t2) => t1.distance?.compareTo(t2.distance!) ?? 0);
-    out.addAll(response.similarTerms as List<Term>);
+    out.addAll(sim as List<Term>);
   }
 
   if (withStart) {
@@ -164,7 +167,8 @@ void similars(StringBuffer buffer, OpenThesaurusResponse response,
 
 void titleHeader(StringBuffer buffer, String query) {
   buffer.writeln(chalk.bold.saddleBrown(query));
-  buffer.writeln(chalk.bold.saddleBrown(List.generate(query.length, (i) => '=').join()));
+  buffer.writeln(
+      chalk.bold.saddleBrown(List.generate(query.length, (i) => '=').join()));
 }
 
 Object blueBullet(String bullet, {int length = 1}) {
@@ -176,7 +180,7 @@ Object synTerms(List<SynonymTerm>? terms, [String query = '']) =>
     terms?.map((term) {
       var out = term.term ?? '';
 
-      if (query == out) {
+      if (query.toLowerCase() == out.toLowerCase()) {
         out = chalk.italic.onYellow.black(out);
       }
       if (term.level != null) {
@@ -196,4 +200,5 @@ bool hasEmptyResponse(OpenThesaurusResponse response) =>
     response.startsWithTerms == null &&
     response.subStringTerms == null;
 
-bool hasSynonyms(OpenThesaurusResponse response) => response.synonymSet?.isNotEmpty ?? false;
+bool hasSynonyms(OpenThesaurusResponse response) =>
+    response.synonymSet?.isNotEmpty ?? false;
