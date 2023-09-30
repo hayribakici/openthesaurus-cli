@@ -46,4 +46,4 @@ Options:
 
 ### Acknowledgements
 
-This program has ben inspired by [radomirbosak/duden](https://github.com/radomirbosak/duden).
+This program has been inspired by [radomirbosak/duden](https://github.com/radomirbosak/duden).
