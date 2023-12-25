@@ -22,7 +22,9 @@ void main(List<String> args) async {
   ArgResults argResults = parser.parse(args);
   ArgResults? help = argResults.command;
   if (help != null) {
-    print(chalk.bold.white('ot [options] <query>'));
+    print(chalk.bold.white('OpenThesaurus Command Line Interface (ot)'));
+    print(chalk.white(
+        'Query synonyms with ', chalk.bold.white('ot [options] <query>')));
     print('\nOptions:');
     print(parser.usage);
     return;
@@ -58,8 +60,9 @@ void main(List<String> args) async {
       from: withFromOption ?? 0,
       max: withMaxOption ?? 10);
 
-  if (hasEmptyResponse(response)) {
-    print(chalk.red('No synonyms for query \'$query\' found.'));
+  if (response.isEmpty) {
+    print(chalk.red('Keine Synonyme für \'$query\' gefunden.'));
+    exitCode = 1;
     return;
   }
 
@@ -68,7 +71,8 @@ void main(List<String> args) async {
   if (hasSynonyms(response)) {
     synonyms(buffer, response, query);
   } else {
-    print(chalk.red('No synonyms for query \'$query\' found.'));
+    print(chalk.red('Keine Synoyme für \'$query\' gefunden.'));
+    print(chalk.yellowGreen('Aber dafür wurden ähnliche Worter:'));
   }
   if (withSimilar || withStart) {
     similars(buffer, response, withSimilar, withStart);
