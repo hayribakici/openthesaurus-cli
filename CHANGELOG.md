@@ -1,3 +1,7 @@
+## 0.0.5
+
+- adds better empty response handling
+
 ## 0.0.4
 
 - highlights case insensitive query-term in search results

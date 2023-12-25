@@ -1,6 +1,6 @@
 name: openthesaurus_cli
 description: An cross platform [openthesaurus](https://openthesaurus.de) command line application.
-version: 0.0.1
+version: 0.0.5
 repository: https://github.com/hayribakici/openthesaurus-cli
 
 environment:
