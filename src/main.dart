@@ -35,7 +35,6 @@ void main(List<String> args) async {
     return;
   }
   final query = argResults.rest[0];
-  var withSimilar = argResults[similar] as bool;
   var withStart = argResults[start] as bool;
   var withBaseForm = argResults[baseForm] as bool;
   var withSuperSets = argResults[superSet] as bool;
@@ -52,7 +51,7 @@ void main(List<String> args) async {
 
   var ot = OpenThesaurus.create();
   var response = await ot.getWithSubString(query,
-      similar: withSimilar,
+      similar: true,
       startsWith: withStart,
       baseForm: withBaseForm,
       superSet: withSuperSets,
@@ -72,11 +71,9 @@ void main(List<String> args) async {
     synonyms(buffer, response, query);
   } else {
     print(chalk.red('Keine Synoyme für \'$query\' gefunden.'));
-    print(chalk.yellowGreen('Aber dafür wurden ähnliche Worter:'));
+    print(chalk.yellowGreen('Aber dafür ähnliche Wörter:'));
   }
-  if (withSimilar || withStart) {
-    similars(buffer, response, withSimilar, withStart);
-  }
+  similars(buffer, response, withStart);
   if (withBaseForm && (response.baseForms?.isNotEmpty ?? false)) {
     buffer.writeln('');
     buffer.writeln(chalk.bold.white('Wörter mit gleicher Grundform:'));
@@ -86,10 +83,6 @@ void main(List<String> args) async {
 }
 
 ArgParser createAndSetupArgParser() => ArgParser()
-  ..addFlag(similar,
-      negatable: false,
-      help: 'Return similar spelled words, helpful for misspellings',
-      abbr: 'a')
   ..addFlag(subSet,
       negatable: false,
       help: 'Return words that are more specific to the query',
@@ -152,16 +145,14 @@ void synonyms(
   }
 }
 
-void similars(StringBuffer buffer, OpenThesaurusResponse response,
-    bool withSimilar, bool withStart) {
+void similars(
+    StringBuffer buffer, OpenThesaurusResponse response, bool withStart) {
   buffer.writeln(
       chalk.bold.white('Teilwort-Treffer und ähnlich geschriebene Wörter:'));
   List<Term> out = [];
-  if (withSimilar) {
-    var sim = response.similarTerms;
-    sim?.sort((t1, t2) => t1.distance?.compareTo(t2.distance!) ?? 0);
-    out.addAll(sim as List<Term>);
-  }
+  var sim = response.similarTerms;
+  sim?.sort((t1, t2) => t1.distance?.compareTo(t2.distance!) ?? 0);
+  out.addAll(sim as List<Term>);
 
   if (withStart) {
     out.addAll(response.startsWithTerms as Iterable<Term>);
