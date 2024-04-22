@@ -1,13 +1,13 @@
 name: openthesaurus_cli
 description: An cross platform [openthesaurus](https://openthesaurus.de) command line application.
-version: 0.0.5
+version: 0.0.6
 repository: https://github.com/hayribakici/openthesaurus-cli
 
 environment:
-  sdk: '>=2.19.2 <3.0.0'
+  sdk: '>=2.19.2 <4.0.0'
 
 dependencies:
-  openthesaurus: 0.0.6
+  openthesaurus: ^0.0.6
   args: ^2.4.2
   chalkdart: ^2.0.9
 
@@ -16,4 +16,4 @@ dev_dependencies:
   test: ^1.21.0
 
 executables: 
-  compile:
+  compile: ot

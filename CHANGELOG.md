@@ -1,3 +1,7 @@
+## 0.0.6
+
+- fixes exception, when no similar terms exist
+
 ## 0.0.5
 
 - adds better empty response handling
