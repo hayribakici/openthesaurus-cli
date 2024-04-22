@@ -147,17 +147,20 @@ void synonyms(
 
 void similars(
     StringBuffer buffer, OpenThesaurusResponse response, bool withStart) {
-  buffer.writeln(
-      chalk.bold.white('Teilwort-Treffer und ähnlich geschriebene Wörter:'));
   List<Term> out = [];
   var sim = response.similarTerms;
   sim?.sort((t1, t2) => t1.distance?.compareTo(t2.distance!) ?? 0);
-  out.addAll(sim as List<Term>);
-
+  if (sim != null) {
+    out.addAll(sim);
+  }
   if (withStart) {
     out.addAll(response.startsWithTerms as Iterable<Term>);
   }
-  buffer.writeln(terms(out));
+  if (out.isNotEmpty) {
+    buffer.writeln(
+        chalk.bold.white('Teilwort-Treffer und ähnlich geschriebene Wörter:'));
+    buffer.writeln(terms(out));
+  }
 }
 
 void titleHeader(StringBuffer buffer, String query) {
