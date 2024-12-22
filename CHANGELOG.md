@@ -1,3 +1,7 @@
+## 0.0.7
+
+- fixes unknown command crash
+
 ## 0.0.6
 
 - fixes exception, when no similar terms exist
