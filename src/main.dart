@@ -14,19 +14,15 @@ const subSet = 'sub';
 const superSet = 'sup';
 const from = 'from';
 const maxResults = 'maxResults';
+const _helpCommand = 'help';
+const _infoCommand = 'info';
 
 void main(List<String> args) async {
   exitCode = 0; // presume success
   final parser = createAndSetupArgParser();
 
   ArgResults argResults = parser.parse(args);
-  ArgResults? help = argResults.command;
-  if (help != null) {
-    print(chalk.bold.white('OpenThesaurus Command Line Interface (ot)'));
-    print(chalk.white(
-        'Query synonyms with ', chalk.bold.white('ot [options] <query>')));
-    print('\nOptions:');
-    print(parser.usage);
+  if (_commandHandled(argResults.command, parser.usage)) {
     return;
   }
   if (argResults.rest.isEmpty) {
@@ -82,6 +78,27 @@ void main(List<String> args) async {
   print(buffer.toString());
 }
 
+bool _commandHandled(ArgResults? command, String usage) {
+  switch (command?.name) {
+    case _helpCommand:
+      print(chalk.bold.white('OpenThesaurus Command Line Interface (ot)'));
+      print('');
+      print(chalk.white(
+          'Query synonyms with ', chalk.bold.white('ot [options] <query>')));
+      print('');
+      print(chalk.white('Options:'));
+      print(chalk.white(usage));
+      return true;
+    case _infoCommand:
+      print(chalk.bold.white('OpenThesaurus Command Line Interface (ot)'));
+      print(
+          chalk.bold.white('https://github.com/hayribakici/openthesaurus-cli'));
+      return true;
+    default:
+      return false;
+  }
+}
+
 ArgParser createAndSetupArgParser() => ArgParser()
   ..addFlag(subSet,
       negatable: false,
@@ -109,7 +126,8 @@ ArgParser createAndSetupArgParser() => ArgParser()
       negatable: false,
       help: 'Return words that have the same starting letters as the query',
       abbr: 's')
-  ..addCommand('help');
+  ..addCommand(_helpCommand)
+  ..addCommand(_infoCommand);
 
 void synonyms(
     StringBuffer buffer, OpenThesaurusResponse response, String query) {
