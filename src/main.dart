@@ -1,11 +1,10 @@
 // Copyright (c) 2023, hayribakici. All rights reserved. Use of this source code
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
-import 'package:chalkdart/chalk_x11.dart';
+import 'package:chalkdart/chalk.dart';
 import 'package:openthesaurus/openthesaurus.dart';
 import 'package:args/args.dart';
 import 'dart:io';
-import 'package:chalkdart/chalk.dart';
 
 const baseForm = 'baseform';
 const similar = 'similar';
@@ -66,12 +65,16 @@ void main(List<String> args) async {
   if (hasSynonyms(response)) {
     synonyms(buffer, response, query);
   } else {
-    print(chalk.red('Keine Synoyme für \'$query\' gefunden.'));
-    print(chalk.yellowGreen('Aber dafür ähnliche Wörter:'));
+    buffer.writeln(chalk.red('Keine Synoyme für \'$query\' gefunden.'));
+    buffer.writeln();
+    buffer.writeln(chalk.yellowGreen('Aber dafür ähnliche Wörter:'));
+    buffer.writeln();
   }
-  similars(buffer, response, withStart);
+  if (hasSimilars(response)) {
+    similars(buffer, response, withStart);
+  }
   if (withBaseForm && (response.baseForms?.isNotEmpty ?? false)) {
-    buffer.writeln('');
+    buffer.writeln();
     buffer.writeln(chalk.bold.white('Wörter mit gleicher Grundform:'));
     buffer.writeln(response.baseForms?.join(', '));
   }
@@ -182,6 +185,7 @@ void similars(
 }
 
 void titleHeader(StringBuffer buffer, String query) {
+  buffer.writeln();
   buffer.writeln(chalk.bold.saddleBrown(query));
   buffer.writeln(
       chalk.bold.saddleBrown(List.generate(query.length, (i) => '=').join()));
@@ -218,3 +222,6 @@ bool hasEmptyResponse(OpenThesaurusResponse response) =>
 
 bool hasSynonyms(OpenThesaurusResponse response) =>
     response.synonymSet?.isNotEmpty ?? false;
+
+bool hasSimilars(OpenThesaurusResponse response) =>
+    response.similarTerms?.isNotEmpty ?? false;
