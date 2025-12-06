@@ -10,7 +10,7 @@
             "request": "launch",
             "type": "dart",
             "program": "src/main.dart",
-            "args": ["help"]
+            "args": ["-a", "hand"]
         }
     ]
 }

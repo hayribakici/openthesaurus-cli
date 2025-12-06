@@ -6,6 +6,7 @@ import 'package:openthesaurus/openthesaurus.dart';
 import 'package:args/args.dart';
 import 'dart:io';
 
+const all = 'all';
 const baseForm = 'baseform';
 const similar = 'similar';
 const start = 'startswith';
@@ -30,10 +31,11 @@ void main(List<String> args) async {
     return;
   }
   final query = argResults.rest[0];
-  var withStart = argResults[start] as bool;
-  var withBaseForm = argResults[baseForm] as bool;
-  var withSuperSets = argResults[superSet] as bool;
-  var withSubSets = argResults[subSet] as bool;
+  var allQuery = argResults[all] as bool;
+  var withStart = allQuery || argResults[start] as bool;
+  var withBaseForm = allQuery || argResults[baseForm] as bool;
+  var withSuperSets = allQuery || argResults[superSet] as bool;
+  var withSubSets = allQuery || argResults[subSet] as bool;
   var withFromOption = int.tryParse(argResults[from] ?? '');
   var withMaxOption = int.tryParse(argResults[maxResults] ?? '');
 
@@ -103,6 +105,10 @@ bool _commandHandled(ArgResults? command, String usage) {
 }
 
 ArgParser createAndSetupArgParser() => ArgParser()
+    ..addFlag(all,
+      negatable: false,
+      help: 'Turn on all flags',
+      abbr: 'a')
   ..addFlag(subSet,
       negatable: false,
       help: 'Return words that are more specific to the query',
@@ -148,18 +154,18 @@ void synonyms(
       buffer.writeln(chalk.slateGray(']'));
     }
 
-    buffer.writeln('${blueBullet('*')} ${synTerms(syn.terms, query)}');
+    buffer.writeln('  ${blueBullet('*')} ${synTerms(syn.terms, query)}');
     if (syn.superSet?.isNotEmpty ?? false) {
       var label = syn.superSet?.length == 1 ? 'Oberbegriff:' : 'Oberbegriffe:';
       buffer.writeln(
-          '${blueBullet('  *')} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
+          '${blueBullet('    *')} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
     }
 
     if (syn.subSet?.isNotEmpty ?? false) {
       var label =
           syn.superSet?.length == 1 ? 'Unterbegriff:' : 'Unterbegriffe:';
       buffer.writeln(
-          '${blueBullet('  *')} ${chalk.aliceBlue(label)} ${synTerms(syn.subSet)}');
+          '${blueBullet('    *')} ${chalk.aliceBlue(label)} ${synTerms(syn.subSet)}');
     }
 
     buffer.writeln('');
