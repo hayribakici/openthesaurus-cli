@@ -10,6 +10,8 @@ dependencies:
   openthesaurus: ^0.0.6
   args: ^2.4.2
   chalkdart: ^2.0.9
+  textwrap: ^2.1.0
+  cli_spin: ^1.0.1
 
 dev_dependencies:
   lints: ^4.0.0

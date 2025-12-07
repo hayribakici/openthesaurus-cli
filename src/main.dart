@@ -2,9 +2,12 @@
 // is governed by a BSD-style license that can be found in the LICENSE file.
 
 import 'package:chalkdart/chalk.dart';
+import 'package:cli_spin/cli_spin.dart';
 import 'package:openthesaurus/openthesaurus.dart';
 import 'package:args/args.dart';
 import 'dart:io';
+
+import 'package:textwrap/textwrap.dart';
 
 const all = 'all';
 const baseForm = 'baseform';
@@ -16,6 +19,10 @@ const from = 'from';
 const maxResults = 'maxResults';
 const _helpCommand = 'help';
 const _infoCommand = 'info';
+final subWrapper = TextWrapper(
+    width: stdout.terminalColumns - 1,
+    initialIndent: '    ${blueBullet('*')} ',
+    subsequentIndent: ' ' * 6);
 
 void main(List<String> args) async {
   exitCode = 0; // presume success
@@ -45,23 +52,37 @@ void main(List<String> args) async {
     exitCode = 1;
     return;
   }
-
+  
   var ot = OpenThesaurus.create();
-  var response = await ot.getWithSubString(query,
-      similar: true,
-      startsWith: withStart,
-      baseForm: withBaseForm,
-      superSet: withSuperSets,
-      subSet: withSubSets,
-      from: withFromOption ?? 0,
-      max: withMaxOption ?? 10);
+  CliSpin.async(
+    (spin) {
+      spin.text = 'Looking up synonyms for $query';
+      return ot.getWithSubString(query,
+          similar: true,
+          startsWith: withStart,
+          baseForm: withBaseForm,
+          superSet: withSuperSets,
+          subSet: withSubSets,
+          from: withFromOption ?? 0,
+          max: withMaxOption ?? 10);
+    },
+    onSuccess: (response, spinner) {
+      if (response.isEmpty) {
+        print(chalk.red('Keine Synonyme für \'$query\' gefunden.'));
+        exitCode = 1;
+        return;
+      }
+      String output = _handleResponse(query, response, withStart, withBaseForm);
+      spinner.stop();
+      spinner.clear;
+      print(output);
+    },
+    onError: (error, spinner) => spinner.stop(),
+  );
+}
 
-  if (response.isEmpty) {
-    print(chalk.red('Keine Synonyme für \'$query\' gefunden.'));
-    exitCode = 1;
-    return;
-  }
-
+String _handleResponse(String query, OpenThesaurusResponse response,
+    bool withStart, bool withBaseForm) {
   final buffer = StringBuffer();
   titleHeader(buffer, query);
   if (hasSynonyms(response)) {
@@ -80,7 +101,7 @@ void main(List<String> args) async {
     buffer.writeln(chalk.bold.white('Wörter mit gleicher Grundform:'));
     buffer.writeln(response.baseForms?.join(', '));
   }
-  print(buffer.toString());
+  return buffer.toString();
 }
 
 bool _commandHandled(ArgResults? command, String usage) {
@@ -105,10 +126,7 @@ bool _commandHandled(ArgResults? command, String usage) {
 }
 
 ArgParser createAndSetupArgParser() => ArgParser()
-    ..addFlag(all,
-      negatable: false,
-      help: 'Turn on all flags',
-      abbr: 'a')
+  ..addFlag(all, negatable: false, help: 'Turn on all flags', abbr: 'a')
   ..addFlag(subSet,
       negatable: false,
       help: 'Return words that are more specific to the query',
@@ -143,7 +161,7 @@ void synonyms(
   if (response.synonymSet == null) {
     return;
   }
-  buffer.writeln('${chalk.bold.white('Synonyme')}:');
+  buffer.writeln(chalk.bold.white('Synonyme:'));
 
   var synSet = response.synonymSet!;
   for (var syn in synSet) {
@@ -154,18 +172,26 @@ void synonyms(
       buffer.writeln(chalk.slateGray(']'));
     }
 
-    buffer.writeln('  ${blueBullet('*')} ${synTerms(syn.terms, query)}');
+    buffer.writeln(
+      fill(synTerms(syn.terms, query).toString(),
+          width: stdout.terminalColumns - 1,
+          initialIndent: '  ${blueBullet('*')} ',
+          subsequentIndent: ' ' * 4),
+    );
+
     if (syn.superSet?.isNotEmpty ?? false) {
       var label = syn.superSet?.length == 1 ? 'Oberbegriff:' : 'Oberbegriffe:';
       buffer.writeln(
-          '${blueBullet('    *')} ${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}');
+        subWrapper.fill('${chalk.aliceBlue(label)} ${synTerms(syn.superSet)}'),
+      );
     }
 
     if (syn.subSet?.isNotEmpty ?? false) {
       var label =
           syn.superSet?.length == 1 ? 'Unterbegriff:' : 'Unterbegriffe:';
       buffer.writeln(
-          '${blueBullet('    *')} ${chalk.aliceBlue(label)} ${synTerms(syn.subSet)}');
+        subWrapper.fill('${chalk.aliceBlue(label)} ${synTerms(syn.subSet)}'),
+      );
     }
 
     buffer.writeln('');
